@@ -22,3 +22,4 @@ D. 將整個資料夾部署到新的 Vercel 專案
 注意：
 - 本系統與既有 HIYU V5 訂位／桌況系統分開。
 - 管理端目前以 authenticated 帳號作為權限基礎；正式營運前建議再建立 admin/employee role RLS。
+Vercel deployment trigger
