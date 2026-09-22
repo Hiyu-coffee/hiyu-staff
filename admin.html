@@ -1,13 +1,28 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HIYU 管理端</title><link rel="stylesheet" href="style.css"></head><body><main class="wrap"><div id="login" class="card"><div class="logo">HIYU</div><h2>管理端登入</h2><div class="field"><label>Email</label><input id="email" type="email"></div><div class="field"><label>密碼</label><input id="password" type="password"></div><button class="btn" onclick="login()">登入</button><div id="msg"></div></div><div id="app" class="hidden"><div class="top"><div><div class="logo">HIYU ADMIN</div><p>店務管理後台</p></div><button class="smallbtn" onclick="logout()">登出</button></div><section class="card"><h2>👥 員工</h2><div id="employees"></div></section><section class="card"><h2>🕘 今日出勤</h2><div id="attendance"></div><button class="btn secondary" onclick="exportCSV()">匯出 CSV</button></section><section class="card"><h2>📢 今日公告</h2><div class="field"><label>標題</label><input id="aTitle"></div><div class="field"><label>內容</label><textarea id="aContent"></textarea></div><button class="btn" onclick="publishAnnouncement()">發布公告</button><div id="aMsg"></div></section><section class="card"><h2>📋 今日工作事項</h2><div class="field"><label>事項</label><input id="tTitle"></div><div class="field"><label>說明</label><textarea id="tDesc"></textarea></div><button class="btn" onclick="publishTask()">新增工作事項</button><div id="tMsg"></div></section><section class="card"><h2>📝 待審核</h2><div id="requests"></div></section><section class="card"><h2>💰 今日交班</h2><div id="closings"></div></section></div></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script>
-const sb=supabase.createClient(window.HIYU_SUPABASE_URL,window.HIYU_SUPABASE_ANON_KEY);let session=null;const today=()=>new Date().toISOString().slice(0,10);
-function show(id,t,ok=false){document.getElementById(id).innerHTML='<p class="'+(ok?'success':'error')+'">'+t+'</p>'}
-async function login(){let r=await sb.auth.signInWithPassword({email:email.value,password:password.value});if(r.error)return show('msg',r.error.message);boot()}
-async function logout(){await sb.auth.signOut();location.reload()}
-async function boot(){let s=await sb.auth.getSession();session=s.data.session;if(!session)return;login.style.display='none';app.classList.remove('hidden');load()}
-async function load(){let e=await sb.from('employees').select('*').order('name');employees.innerHTML=(e.data||[]).map(x=>'<p>👤 '+x.name+'｜'+(x.employee_no||'')+'｜'+(x.status||'active')+'</p>').join('')||'無資料';let a=await sb.from('attendance').select('*,employees(name)').eq('work_date',today()).order('clock_in');attendance.innerHTML='<table class="table"><tr><th>員工</th><th>上班</th><th>下班</th></tr>'+((a.data||[]).map(x=>'<tr><td>'+x.employees?.name+'</td><td>'+fmt(x.clock_in)+'</td><td>'+fmt(x.clock_out)+'</td></tr>').join(''))+'</table>';let l=await sb.from('leave_requests').select('*,employees(name)').eq('status','pending');let c=await sb.from('attendance_corrections').select('*,employees(name)').eq('status','pending');requests.innerHTML=[...(l.data||[]).map(x=>'請假｜'+x.employees?.name+'｜'+x.leave_date+'｜'+x.reason),...(c.data||[]).map(x=>'異動｜'+x.employees?.name+'｜'+x.work_date+'｜'+x.reason)].map(x=>'<p>'+x+'</p>').join('')||'<p>目前沒有待審核</p>';let d=await sb.from('daily_handover').select('*,employees(name)').eq('work_date',today());closings.innerHTML=(d.data||[]).map(x=>'<p>'+x.employees?.name+'｜現金 '+x.cash+'｜LINE Pay '+x.line_pay+'｜其他 '+x.other_payment+'｜支出 '+x.expenses+'｜差額 '+x.cash_difference+'</p>').join('')||'<p>尚無交班</p>'}
-function fmt(x){return x?new Date(x).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}):'—'}
-async function publishAnnouncement(){let r=await sb.from('announcements').insert({title:aTitle.value,content:aContent.value,is_published:true,publish_at:new Date().toISOString(),priority:'一般'});show('aMsg',r.error?r.error.message:'公告已發布',!r.error);load()}
-async function publishTask(){let r=await sb.from('work_tasks').insert({task_date:today(),title:tTitle.value,description:tDesc.value,sort_order:0});show('tMsg',r.error?r.error.message:'工作事項已新增',!r.error);load()}
-function exportCSV(){sb.from('attendance').select('work_date,employee_id,clock_in,clock_out').gte('work_date',today()).then(r=>{let csv='work_date,employee_id,clock_in,clock_out\n'+(r.data||[]).map(x=>[x.work_date,x.employee_id,x.clock_in,x.clock_out].join(',')).join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='HIYU_attendance.csv';a.click()})}
-boot();
-</script></body></html>
+HIYU
+管理端登入
+
+Email  
+密碼  
+登入
+HIYU ADMIN
+店務管理後台
+
+登出
+👥 員工
+
+🕘 今日出勤
+
+匯出 CSV
+📢 今日公告
+
+標題
+內容
+發布公告
+📋 今日工作事項
+
+事項
+說明
+新增工作事項
+📝 待審核
+
+💰 今日交班
