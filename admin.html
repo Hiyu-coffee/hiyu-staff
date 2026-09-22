@@ -1,28 +1,1399 @@
-HIYU
-管理端登入
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HIYU 管理端</title>
 
-Email  
-密碼  
-登入
-HIYU ADMIN
-店務管理後台
+<style>
+:root{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
+  "Noto Sans TC",sans-serif;
+  color:#18324a;
+  background:#f3f7fb
+}
 
-登出
-👥 員工
+*{
+  box-sizing:border-box
+}
 
-🕘 今日出勤
+body{
+  margin:0;
+  background:#f3f7fb
+}
 
-匯出 CSV
-📢 今日公告
+.wrap{
+  max-width:980px;
+  margin:0 auto;
+  padding:28px 18px 60px
+}
 
-標題
-內容
-發布公告
-📋 今日工作事項
+.card{
+  background:#fff;
+  border:1px solid #dce6ef;
+  border-radius:18px;
+  padding:22px;
+  margin:0 0 18px;
+  box-shadow:0 4px 18px rgba(20,50,80,.06)
+}
 
-事項
-說明
-新增工作事項
-📝 待審核
+.logo{
+  font-weight:800;
+  letter-spacing:2px;
+  color:#2d6f9f;
+  font-size:22px
+}
 
-💰 今日交班
+h2{
+  margin:8px 0 18px;
+  color:#18324a
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px
+}
+
+.field{
+  margin:12px 0
+}
+
+label{
+  display:block;
+  font-weight:700;
+  margin-bottom:6px
+}
+
+input,
+textarea{
+  width:100%;
+  border:1px solid #ccd9e5;
+  border-radius:10px;
+  padding:12px;
+  font-size:16px;
+  background:#fff
+}
+
+textarea{
+  min-height:100px;
+  resize:vertical
+}
+
+.btn,
+.smallbtn{
+  border:0;
+  border-radius:10px;
+  padding:12px 18px;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+  background:#2d6f9f;
+  color:#fff
+}
+
+.btn:disabled{
+  opacity:.6;
+  cursor:wait
+}
+
+.smallbtn{
+  padding:9px 14px;
+  font-size:14px
+}
+
+.secondary{
+  margin-top:14px;
+  background:#607d94
+}
+
+.hidden{
+  display:none!important
+}
+
+.error{
+  color:#b42318;
+  background:#fff1f0;
+  border:1px solid #f3c7c3;
+  border-radius:10px;
+  padding:10px
+}
+
+.success{
+  color:#18794e;
+  background:#eefaf3;
+  border:1px solid #bfe5ce;
+  border-radius:10px;
+  padding:10px
+}
+
+.table{
+  width:100%;
+  border-collapse:collapse
+}
+
+.table th,
+.table td{
+  border-bottom:1px solid #e6edf3;
+  padding:10px;
+  text-align:left
+}
+
+@media(max-width:600px){
+
+  .wrap{
+    padding:18px 12px 40px
+  }
+
+  .card{
+    padding:16px;
+    border-radius:14px
+  }
+
+  .top{
+    align-items:flex-start
+  }
+
+  .table{
+    font-size:14px
+  }
+}
+</style>
+</head>
+
+<body>
+
+<main class="wrap">
+
+<!-- ==================== 登入 ==================== -->
+
+<div id="loginBox" class="card">
+
+  <div class="logo">
+    HIYU
+  </div>
+
+  <h2>
+    管理端登入
+  </h2>
+
+  <div class="field">
+
+    <label>
+      Email
+    </label>
+
+    <input
+      id="emailInput"
+      type="email"
+      autocomplete="username"
+      placeholder="請輸入管理者 Email"
+    >
+
+  </div>
+
+  <div class="field">
+
+    <label>
+      密碼
+    </label>
+
+    <input
+      id="passwordInput"
+      type="password"
+      autocomplete="current-password"
+      placeholder="請輸入密碼"
+    >
+
+  </div>
+
+  <button
+    id="loginBtn"
+    class="btn"
+    type="button"
+  >
+    登入
+  </button>
+
+  <div id="loginMsg"></div>
+
+</div>
+
+
+<!-- ==================== 管理後台 ==================== -->
+
+<div id="app" class="hidden">
+
+  <div class="top">
+
+    <div>
+
+      <div class="logo">
+        HIYU ADMIN
+      </div>
+
+      <p>
+        店務管理後台
+      </p>
+
+    </div>
+
+    <button
+      id="logoutBtn"
+      class="smallbtn"
+      type="button"
+    >
+      登出
+    </button>
+
+  </div>
+
+
+  <!-- 員工 -->
+
+  <section class="card">
+
+    <h2>
+      👥 員工
+    </h2>
+
+    <div id="employees">
+      載入中…
+    </div>
+
+  </section>
+
+
+  <!-- 今日出勤 -->
+
+  <section class="card">
+
+    <h2>
+      🕘 今日出勤
+    </h2>
+
+    <div id="attendance">
+      載入中…
+    </div>
+
+    <button
+      id="exportBtn"
+      class="btn secondary"
+      type="button"
+    >
+      匯出 CSV
+    </button>
+
+  </section>
+
+
+  <!-- 公告 -->
+
+  <section class="card">
+
+    <h2>
+      📢 今日公告
+    </h2>
+
+    <div class="field">
+
+      <label>
+        標題
+      </label>
+
+      <input
+        id="aTitle"
+        placeholder="例如：今日店務通知"
+      >
+
+    </div>
+
+    <div class="field">
+
+      <label>
+        內容
+      </label>
+
+      <textarea
+        id="aContent"
+        placeholder="輸入公告內容"
+      ></textarea>
+
+    </div>
+
+    <button
+      id="publishAnnouncementBtn"
+      class="btn"
+      type="button"
+    >
+      發布公告
+    </button>
+
+    <div id="aMsg"></div>
+
+  </section>
+
+
+  <!-- 工作事項 -->
+
+  <section class="card">
+
+    <h2>
+      📋 今日工作事項
+    </h2>
+
+    <div class="field">
+
+      <label>
+        事項
+      </label>
+
+      <input
+        id="tTitle"
+        placeholder="例如：冰箱整理"
+      >
+
+    </div>
+
+    <div class="field">
+
+      <label>
+        說明
+      </label>
+
+      <textarea
+        id="tDesc"
+        placeholder="輸入工作說明"
+      ></textarea>
+
+    </div>
+
+    <button
+      id="publishTaskBtn"
+      class="btn"
+      type="button"
+    >
+      新增工作事項
+    </button>
+
+    <div id="tMsg"></div>
+
+  </section>
+
+
+  <!-- 待審核 -->
+
+  <section class="card">
+
+    <h2>
+      📝 待審核
+    </h2>
+
+    <div id="requests">
+      載入中…
+    </div>
+
+  </section>
+
+
+  <!-- 交班 -->
+
+  <section class="card">
+
+    <h2>
+      💰 今日交班
+    </h2>
+
+    <div id="closings">
+      載入中…
+    </div>
+
+  </section>
+
+</div>
+
+</main>
+
+
+<!-- ==================== Supabase ==================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="config.js"></script>
+
+
+<script>
+
+/* =========================================
+   Supabase
+========================================= */
+
+const sb = supabase.createClient(
+  window.HIYU_SUPABASE_URL,
+  window.HIYU_SUPABASE_ANON_KEY
+);
+
+
+/* =========================================
+   全域變數
+========================================= */
+
+let session = null;
+
+let manager = null;
+
+
+/* =========================================
+   台灣日期
+========================================= */
+
+const today = () => {
+
+  return new Date().toLocaleDateString(
+    'en-CA',
+    {
+      timeZone:'Asia/Taipei'
+    }
+  );
+
+};
+
+
+/* =========================================
+   訊息
+========================================= */
+
+function show(id,text,ok=false){
+
+  const el =
+    document.getElementById(id);
+
+  if(!el){
+    return;
+  }
+
+  el.innerHTML =
+    '<p class="' +
+    (ok ? 'success' : 'error') +
+    '">' +
+    text +
+    '</p>';
+
+}
+
+
+/* =========================================
+   時間格式
+========================================= */
+
+function fmt(x){
+
+  if(!x){
+    return '—';
+  }
+
+  return new Date(x).toLocaleTimeString(
+    'zh-TW',
+    {
+      hour:'2-digit',
+      minute:'2-digit',
+      timeZone:'Asia/Taipei'
+    }
+  );
+
+}
+
+
+/* =========================================
+   登入
+========================================= */
+
+async function adminLogin(){
+
+  const email =
+    document
+      .getElementById('emailInput')
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById('passwordInput')
+      .value;
+
+
+  if(!email || !password){
+
+    show(
+      'loginMsg',
+      '請輸入 Email 與密碼'
+    );
+
+    return;
+
+  }
+
+
+  const btn =
+    document.getElementById('loginBtn');
+
+
+  btn.disabled = true;
+
+  btn.textContent = '登入中…';
+
+
+  try{
+
+    const r =
+      await sb.auth.signInWithPassword({
+
+        email:email,
+
+        password:password
+
+      });
+
+
+    if(r.error){
+
+      show(
+        'loginMsg',
+        r.error.message
+      );
+
+      btn.disabled = false;
+
+      btn.textContent = '登入';
+
+      return;
+
+    }
+
+
+    await boot();
+
+
+  }catch(error){
+
+    show(
+      'loginMsg',
+      '登入發生錯誤：' +
+      error.message
+    );
+
+    btn.disabled = false;
+
+    btn.textContent = '登入';
+
+  }
+
+}
+
+
+/* =========================================
+   啟動管理端
+========================================= */
+
+async function boot(){
+
+  try{
+
+    const s =
+      await sb.auth.getSession();
+
+
+    session =
+      s.data.session;
+
+
+    if(!session){
+
+      return;
+
+    }
+
+
+    /*
+      根據 Auth User ID
+      找到員工資料
+    */
+
+    const r =
+      await sb
+        .from('employees')
+        .select(
+          'id,name,employee_no,role,active'
+        )
+        .eq(
+          'auth_user_id',
+          session.user.id
+        )
+        .maybeSingle();
+
+
+    if(r.error){
+
+      show(
+        'loginMsg',
+        '管理者資料讀取失敗：' +
+        r.error.message
+      );
+
+      await sb.auth.signOut();
+
+      return;
+
+    }
+
+
+    if(!r.data){
+
+      show(
+        'loginMsg',
+        '此帳號尚未綁定員工資料'
+      );
+
+      await sb.auth.signOut();
+
+      return;
+
+    }
+
+
+    /*
+      管理者權限
+    */
+
+    if(r.data.role !== '管理者'){
+
+      show(
+        'loginMsg',
+        '此帳號沒有管理端權限'
+      );
+
+      await sb.auth.signOut();
+
+      return;
+
+    }
+
+
+    manager =
+      r.data;
+
+
+    /*
+      隱藏登入
+    */
+
+    document
+      .getElementById('loginBox')
+      .style.display = 'none';
+
+
+    /*
+      顯示管理後台
+    */
+
+    document
+      .getElementById('app')
+      .classList
+      .remove('hidden');
+
+
+    /*
+      載入資料
+    */
+
+    await load();
+
+
+  }catch(error){
+
+    show(
+      'loginMsg',
+      '管理端啟動失敗：' +
+      error.message
+    );
+
+  }
+
+}
+
+
+/* =========================================
+   載入資料
+========================================= */
+
+async function load(){
+
+
+  /* =========================
+     員工
+  ========================= */
+
+  const e =
+    await sb
+      .from('employees')
+      .select('*')
+      .order('name');
+
+
+  if(e.error){
+
+    show(
+      'employees',
+      '員工資料讀取失敗：' +
+      e.error.message
+    );
+
+  }else{
+
+    document
+      .getElementById('employees')
+      .innerHTML =
+
+      (e.data || [])
+      .map(x =>
+
+        '<p>' +
+
+        '👤 ' +
+
+        x.name +
+
+        '｜' +
+
+        (x.employee_no || '') +
+
+        '｜' +
+
+        (
+          x.active === false
+          ? '停用'
+          : '啟用'
+        ) +
+
+        '</p>'
+
+      )
+      .join('')
+
+      || '無資料';
+
+  }
+
+
+  /* =========================
+     今日出勤
+  ========================= */
+
+  const a =
+    await sb
+      .from('attendance')
+      .select(
+        '*,employees(name)'
+      )
+      .eq(
+        'work_date',
+        today()
+      )
+      .order('clock_in');
+
+
+  if(a.error){
+
+    show(
+      'attendance',
+      '出勤資料讀取失敗：' +
+      a.error.message
+    );
+
+  }else{
+
+    document
+      .getElementById('attendance')
+      .innerHTML =
+
+      '<table class="table">' +
+
+      '<tr>' +
+
+      '<th>員工</th>' +
+
+      '<th>上班</th>' +
+
+      '<th>下班</th>' +
+
+      '</tr>' +
+
+      (a.data || [])
+      .map(x =>
+
+        '<tr>' +
+
+        '<td>' +
+
+        (
+          x.employees?.name ||
+          '—'
+        ) +
+
+        '</td>' +
+
+        '<td>' +
+
+        fmt(x.clock_in) +
+
+        '</td>' +
+
+        '<td>' +
+
+        fmt(x.clock_out) +
+
+        '</td>' +
+
+        '</tr>'
+
+      )
+      .join('') +
+
+      '</table>';
+
+  }
+
+
+  /* =========================
+     請假 / 出勤異動
+  ========================= */
+
+  const l =
+    await sb
+      .from('leave_requests')
+      .select(
+        '*,employees(name)'
+      )
+      .eq(
+        'status',
+        'pending'
+      );
+
+
+  const c =
+    await sb
+      .from('attendance_corrections')
+      .select(
+        '*,employees(name)'
+      )
+      .eq(
+        'status',
+        'pending'
+      );
+
+
+  if(l.error || c.error){
+
+    show(
+      'requests',
+      '待審核資料讀取失敗：' +
+
+      (
+        l.error?.message ||
+        c.error?.message
+      )
+    );
+
+  }else{
+
+    const list = [];
+
+
+    (l.data || [])
+      .forEach(x => {
+
+        list.push(
+
+          '請假｜' +
+
+          (
+            x.employees?.name ||
+            '—'
+          ) +
+
+          '｜' +
+
+          (
+            x.leave_date ||
+            '—'
+          ) +
+
+          '｜' +
+
+          (
+            x.reason ||
+            ''
+          )
+
+        );
+
+      });
+
+
+    (c.data || [])
+      .forEach(x => {
+
+        list.push(
+
+          '異動｜' +
+
+          (
+            x.employees?.name ||
+            '—'
+          ) +
+
+          '｜' +
+
+          (
+            x.work_date ||
+            '—'
+          ) +
+
+          '｜' +
+
+          (
+            x.reason ||
+            ''
+          )
+
+        );
+
+      });
+
+
+    document
+      .getElementById('requests')
+      .innerHTML =
+
+      list
+        .map(x => '<p>' + x + '</p>')
+        .join('')
+
+      ||
+
+      '<p>目前沒有待審核</p>';
+
+  }
+
+
+  /* =========================
+     今日交班
+  ========================= */
+
+  const d =
+    await sb
+      .from('daily_handover')
+      .select(
+        '*,employees(name)'
+      )
+      .eq(
+        'work_date',
+        today()
+      );
+
+
+  if(d.error){
+
+    show(
+      'closings',
+      '交班資料讀取失敗：' +
+      d.error.message
+    );
+
+  }else{
+
+    document
+      .getElementById('closings')
+      .innerHTML =
+
+      (d.data || [])
+      .map(x =>
+
+        '<p>' +
+
+        (
+          x.employees?.name ||
+          '—'
+        ) +
+
+        '｜現金 ' +
+
+        (
+          x.cash ?? 0
+        ) +
+
+        '｜LINE Pay ' +
+
+        (
+          x.line_pay ?? 0
+        ) +
+
+        '｜其他 ' +
+
+        (
+          x.other_payment ?? 0
+        ) +
+
+        '｜支出 ' +
+
+        (
+          x.expenses ?? 0
+        ) +
+
+        '｜差額 ' +
+
+        (
+          x.cash_difference ?? 0
+        ) +
+
+        '</p>'
+
+      )
+      .join('')
+
+      ||
+
+      '<p>尚無交班</p>';
+
+  }
+
+}
+
+
+/* =========================================
+   登出
+========================================= */
+
+async function logout(){
+
+  await sb.auth.signOut();
+
+  location.reload();
+
+}
+
+
+/* =========================================
+   發布公告
+========================================= */
+
+async function publishAnnouncement(){
+
+  const title =
+    document
+      .getElementById('aTitle')
+      .value
+      .trim();
+
+
+  const content =
+    document
+      .getElementById('aContent')
+      .value
+      .trim();
+
+
+  if(!title || !content){
+
+    show(
+      'aMsg',
+      '請輸入公告標題與內容'
+    );
+
+    return;
+
+  }
+
+
+  const r =
+    await sb
+      .from('announcements')
+      .insert({
+
+        title:title,
+
+        content:content,
+
+        is_published:true,
+
+        publish_at:
+          new Date().toISOString(),
+
+        priority:'一般'
+
+      });
+
+
+  if(r.error){
+
+    show(
+      'aMsg',
+      r.error.message
+    );
+
+    return;
+
+  }
+
+
+  show(
+    'aMsg',
+    '公告已發布',
+    true
+  );
+
+
+  document
+    .getElementById('aTitle')
+    .value = '';
+
+
+  document
+    .getElementById('aContent')
+    .value = '';
+
+
+  await load();
+
+}
+
+
+/* =========================================
+   新增工作事項
+========================================= */
+
+async function publishTask(){
+
+  const title =
+    document
+      .getElementById('tTitle')
+      .value
+      .trim();
+
+
+  const description =
+    document
+      .getElementById('tDesc')
+      .value
+      .trim();
+
+
+  if(!title){
+
+    show(
+      'tMsg',
+      '請輸入工作事項'
+    );
+
+    return;
+
+  }
+
+
+  const r =
+    await sb
+      .from('work_tasks')
+      .insert({
+
+        task_date:today(),
+
+        title:title,
+
+        description:description,
+
+        sort_order:0
+
+      });
+
+
+  if(r.error){
+
+    show(
+      'tMsg',
+      r.error.message
+    );
+
+    return;
+
+  }
+
+
+  show(
+    'tMsg',
+    '工作事項已新增',
+    true
+  );
+
+
+  document
+    .getElementById('tTitle')
+    .value = '';
+
+
+  document
+    .getElementById('tDesc')
+    .value = '';
+
+
+  await load();
+
+}
+
+
+/* =========================================
+   CSV
+========================================= */
+
+async function exportCSV(){
+
+  const r =
+    await sb
+      .from('attendance')
+      .select(
+        'work_date,employee_id,clock_in,clock_out'
+      )
+      .gte(
+        'work_date',
+        today()
+      );
+
+
+  if(r.error){
+
+    alert(r.error.message);
+
+    return;
+
+  }
+
+
+  const csv =
+
+    'work_date,employee_id,clock_in,clock_out\n' +
+
+    (r.data || [])
+      .map(x =>
+
+        [
+
+          x.work_date,
+
+          x.employee_id,
+
+          x.clock_in,
+
+          x.clock_out
+
+        ].join(',')
+
+      )
+      .join('\n');
+
+
+  const a =
+    document.createElement('a');
+
+
+  a.href =
+    URL.createObjectURL(
+      new Blob(
+        [csv],
+        {
+          type:'text/csv'
+        }
+      )
+    );
+
+
+  a.download =
+    'HIYU_attendance.csv';
+
+
+  a.click();
+
+}
+
+
+/* =========================================
+   按鈕事件
+========================================= */
+
+document
+  .getElementById('loginBtn')
+  .addEventListener(
+    'click',
+    adminLogin
+  );
+
+
+document
+  .getElementById('logoutBtn')
+  .addEventListener(
+    'click',
+    logout
+  );
+
+
+document
+  .getElementById('publishAnnouncementBtn')
+  .addEventListener(
+    'click',
+    publishAnnouncement
+  );
+
+
+document
+  .getElementById('publishTaskBtn')
+  .addEventListener(
+    'click',
+    publishTask
+  );
+
+
+document
+  .getElementById('exportBtn')
+  .addEventListener(
+    'click',
+    exportCSV
+  );
+
+
+/* Enter 登入 */
+
+document
+  .getElementById('passwordInput')
+  .addEventListener(
+    'keydown',
+    e => {
+
+      if(e.key === 'Enter'){
+
+        adminLogin();
+
+      }
+
+    }
+  );
+
+
+/* =========================================
+   自動檢查登入狀態
+========================================= */
+
+boot();
+
+</script>
+
+</body>
+</html>
